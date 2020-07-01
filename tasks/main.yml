@@ -1,0 +1,65 @@
+---
+
+- name: Create directory /opt/infra-binaries/temp
+  file:
+    path: /opt/infra-binaries/temp
+    state: directory
+    owner: '{{ ansible_user_id }}'
+    group: '{{ ansible_user_id }}'
+    mode: 0755
+  become: yes
+
+##################################################
+# Binaries
+##################################################
+- block:
+
+  - name: Download and untar all binaries
+    unarchive:
+      src: '{{ kubernetes_url }}'
+      dest: /opt/infra-binaries/temp/
+      remote_src: yes
+  
+  - name: Move kubernetes binaries to /opt/infra-binaries
+    copy:
+      remote_src: yes
+      src: "/opt/infra-binaries/temp/kubernetes/server/bin/{{ item }}"
+      dest: /opt/infra-binaries
+      mode: 0744
+    with_items:
+      - kube-proxy
+      - kubelet
+  
+  tags: [binaries]
+
+##################################################
+# Token
+##################################################
+
+- block:
+
+  tags: [token]
+
+
+##################################################
+# Services
+##################################################
+- block:
+
+  - name: Move services files
+    template:
+      src: "{{ item }}"
+      dest: /etc/systemd/system/{{ item | basename | regex_replace('\.j2$', '') }}
+      owner: '{{ ansible_user_id }}'
+      group: '{{ ansible_user_id }}'
+      mode: '0644'
+      backup: yes
+    become: yes
+    with_items:
+      - kube-kubelet.service.j2
+      - kube-proxy.service.j2
+    notify:
+    - restart kube-kubelet
+    - restart kube-proxy
+ 
+  tags: [services]

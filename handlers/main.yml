@@ -1,0 +1,13 @@
+---
+
+- name: restart kube-kubelet
+  systemd:
+    name: kube-kubelet
+    state: restarted
+    enabled: yes
+
+- name: restart kube-proxy
+  systemd:
+    name: kube-proxy
+    state: restarted
+    enabled: yes

@@ -1,0 +1,4 @@
+kube_version: 1.17.3
+kubernetes_url: https://storage.googleapis.com/kubernetes-release/release/v{{ kube_version }}/kubernetes-server-linux-amd64.tar.gz
+
+api_servers: 

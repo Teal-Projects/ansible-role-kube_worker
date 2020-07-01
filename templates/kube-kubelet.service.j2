@@ -1,0 +1,21 @@
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+Requires=docker.service
+After=docker.service
+
+[Service]
+ExecStart=/opt/infra-binaries/kubelet \
+--address=0.0.0.0 \
+--api_servers={{ api_servers }} \
+--enable_server \
+--logtostderr=true \
+--port=10250 \
+--v=2
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
